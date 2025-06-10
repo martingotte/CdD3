@@ -7,7 +7,33 @@ Original file is located at
     https://colab.research.google.com/drive/15fbg-y0F_CIJoMYKrBmniviwWznrPxLi
 """
 
-# @title Texto de título predeterminado
+"""
+modulo: clase_datos3
+--------------------
+
+Este modulo proporciona clases para realizar resumen estadistico, generacion de datos, estimacion de densidades, anova, regresion simple, multiple y logistica.
+
+Clases:
+    GeneradoraDeDatos: produce datos de distintas distribuciones.
+
+    Estimacion: proporciona calculos de estadisticos basicos.
+
+    Regresion: clase madre de regresion.
+
+    RegresionLineal: contiene funciones de regresion lineal simple y multiple, hereda funciones de Regresion.
+
+    RegresionLogistica: contiene funciones de regresion logistica, hereda funciones de Regresion.
+
+    Anova: muestra resultados de un analisis de anova.
+
+    cualitativas: compara muestras con distribuciones usando chi-cuadrado.
+
+Funciones:
+    dummies: convierte variables categoricas en dummies.
+
+"""
+
+#librerias usadas:
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,35 +46,108 @@ from statsmodels.stats.anova import anova_lm
 
 
 class GeneradoraDeDatos:
-  def __init__(self,N=1000):
+  """
+  clase para generar datos, usando numpy y scipy.stats
+
+  atributos:
+
+
+  """
+  def __init__(self,N=1000:float):
     self.N=N
 
-  def distribucion_datos_normal(self,media,desvio):
+    """
+    inicializa una instancia de GeneradoraDeDatos.
+
+    Args:
+      N(float): numero de datos a generar
+    """
+
+  def distribucion_datos_normal(self,media=0:float,desvio=1:float) -> np.ndarray:
+    """
+    simula una distribuacion teorica normal.
+
+    Args:
+      media(float): media de la distribucion normal.
+      desvio(float): desvio de la distribucion normal.
+
+    """
     grilla=np.linspace(media-3*desvio,media+3*desvio,self.N)
     self.datos_normal=self.pdf_norm(grilla,media,desvio)
     return self.datos_normal
 
-  def generar_datos_normal(self,media,desvio):
+  def generar_datos_normal(self,media=0:float,desvio=1:float) -> np.ndarray:
+    """
+    genera una muestra normal random.
+
+    Args:
+      media(float): media de la distribucion normal.
+      desvio(float): desvio de la distribucion normal.
+
+    """
     return np.random.normal(media,desvio,self.N)
 
-  def distribucion_datos_uniforme(self,min,max):
+  def distribucion_datos_uniforme(self,min:float,max:float) -> np.ndarray:
+    """
+    simula una distribucion teorica uniforme.
+
+    Args:
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+
+    """
     grilla=np.linspace(min,max,self.N)
     self.datos_uniforme=self.pdf_uniforme(grilla,min,max)
     return self.datos_uniforme
 
-  def generar_datos_uniforme(self,min,max):
+  def generar_datos_uniforme(self,min:float,max:float) -> np.ndarray:
+    """
+    genera una muestra uniforme random.
+
+    Args:
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+
+    """
     return np.random.uniform(min,max,self.N)
 
-  def pdf_uniforme(self,x,min,max):
+  def pdf_uniforme(self,x:float,min:float,max:float) -> np.ndarray:
+    """
+    devuelve la densidad de x en la distribucion uniforme.
+
+    Args:
+      x: valor de entrada.
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+    """
     return stats.uniform.pdf(x,min,max)
 
-  def cdf_uniforme(self,x,min,max):
+  def cdf_uniforme(self,x:float,min:float,max:float):
+    """
+    devuelve la densidad acumulada de x en la distribucion uniforme.
+
+    Args:
+      x: valor de entrada.
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+    """
     return stats.uniform.cdf(x,min,max)
 
-  def ppf_uniforme(self,x,min,max):
+  def ppf_uniforme(self,x:float,min:float,max:float) -> np.ndarray:
+    """
+    devuelve el percentil correspondiente a x de la distribucion uniforme.
+
+    Args:
+      x: valor de entrada.
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+    """
     return stats.uniform.ppf(x,min,max)
 
-  def generar_datos_BS(self):
+  def generar_datos_BS(self) -> np.ndarray:
+    """
+    genera una muestra de distribucion BS(Bart Simpson).
+    """
     u = np.random.uniform(size=(self.N,))
     y = u.copy()
     ind = np.where(u > 0.5)[0]
@@ -58,7 +157,14 @@ class GeneradoraDeDatos:
         y[ind] = np.random.normal(j/2 - 1, 1/10, size=len(ind))
     return y
 
-  def distribucion_datos_BS(self,min,max):
+  def distribucion_datos_BS(self,min:float,max:float) -> np.ndarray:
+    """
+    simula una distribucion teorica BS(Bart Simpson).
+
+    Args:
+      min: valor minimo de la distribucion.
+      max: valor maximo de la distribucion.
+    """
     grilla=np.linspace(min,max,self.N)
     sumatoria=0
     for j in range(5):
@@ -66,7 +172,13 @@ class GeneradoraDeDatos:
     self.datos_BS=(1/2)*stats.norm.pdf(grilla,0,1)+(1/10)*sumatoria
     return grilla,self.datos_BS
 
-  def generar_datos_exponencial(self,b):
+  def generar_datos_exponencial(self,b:float) -> np.ndarray:
+    """
+    genera una muestra exponencial random.
+
+    Args:
+      b: parametro de la distribucion exponencial.
+    """
     return np.random.exponential(scale=b,size=self.N)
 
 
@@ -226,8 +338,8 @@ class Estimacion:
     plt.plot(cuantiles_teoricos,cuantiles_teoricos , linestyle='-', color='red')
     plt.show()
 
-  def dummies(self,columna):
-    dummies=pd.get_dummies(self.datos[columna],columns=[columna],drop_first=True).astype(int)
+def dummies(datos,columna):
+    dummies=pd.get_dummies(datos[columna],columns=[columna],drop_first=True).astype(int)
     return dummies
 
 
@@ -391,3 +503,26 @@ class anova():
 
   def f_valores(self):
     return self.anova.fvalue
+
+
+
+
+
+class cualitativas:
+  def __init__(self,muestra,muestra_teorica):
+    self.muestra=muestra
+    self.muestra_teorica=muestra_teorica
+    self.grados_libertad=len(muestra)-1
+
+  def chi_observado(self):
+    x2_observado=np.sum((self.muestra-self.muestra_teorica)**2/self.muestra_teorica)
+    return x2_observado
+
+  def chi_alpha(self,alpha):
+    x2_alpha=stats.chi2.ppf(1-alpha,self.grados_libertad)
+    return x2_alpha
+
+  def p_valor(self):
+    x2_observado=self.chi_observado()
+    p_valor=1-stats.chi2.cdf(x2_observado,self.grados_libertad)
+    return p_valor
