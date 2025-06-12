@@ -53,7 +53,7 @@ class GeneradoraDeDatos:
 
 
   """
-  def __init__(self,N=1000:float):
+  def __init__(self,N=1000):
     self.N=N
 
     """
@@ -63,7 +63,7 @@ class GeneradoraDeDatos:
       N(float): numero de datos a generar
     """
 
-  def distribucion_datos_normal(self,media=0:float,desvio=1:float) -> np.ndarray:
+  def distribucion_datos_normal(self,media=0,desvio=1) -> np.ndarray:
     """
     simula una distribuacion teorica normal.
 
@@ -72,11 +72,11 @@ class GeneradoraDeDatos:
       desvio(float): desvio de la distribucion normal.
 
     """
-    grilla=np.linspace(media-3*desvio,media+3*desvio,self.N)
-    self.datos_normal=self.pdf_norm(grilla,media,desvio)
+    __grilla=np.linspace(media-3*desvio,media+3*desvio,self.N)
+    self.datos_normal=self.pdf_norm(__grilla,media,desvio)
     return self.datos_normal
 
-  def generar_datos_normal(self,media=0:float,desvio=1:float) -> np.ndarray:
+  def generar_datos_normal(self,media=0,desvio=1) -> np.ndarray:
     """
     genera una muestra normal random.
 
@@ -87,7 +87,7 @@ class GeneradoraDeDatos:
     """
     return np.random.normal(media,desvio,self.N)
 
-  def distribucion_datos_uniforme(self,min:float,max:float) -> np.ndarray:
+  def distribucion_datos_uniforme(self,min,max) -> np.ndarray:
     """
     simula una distribucion teorica uniforme.
 
@@ -96,11 +96,11 @@ class GeneradoraDeDatos:
       max: valor maximo de la distribucion.
 
     """
-    grilla=np.linspace(min,max,self.N)
-    self.datos_uniforme=self.pdf_uniforme(grilla,min,max)
+    __grilla=np.linspace(min,max,self.N)
+    self.datos_uniforme=self.pdf_uniforme(__grilla,min,max)
     return self.datos_uniforme
 
-  def generar_datos_uniforme(self,min:float,max:float) -> np.ndarray:
+  def generar_datos_uniforme(self,min,max) -> np.ndarray:
     """
     genera una muestra uniforme random.
 
@@ -111,7 +111,7 @@ class GeneradoraDeDatos:
     """
     return np.random.uniform(min,max,self.N)
 
-  def pdf_uniforme(self,x:float,min:float,max:float) -> np.ndarray:
+  def pdf_uniforme(self,x,min,max) -> np.ndarray:
     """
     devuelve la densidad de x en la distribucion uniforme.
 
@@ -122,7 +122,7 @@ class GeneradoraDeDatos:
     """
     return stats.uniform.pdf(x,min,max)
 
-  def cdf_uniforme(self,x:float,min:float,max:float):
+  def cdf_uniforme(self,x,min,max):
     """
     devuelve la densidad acumulada de x en la distribucion uniforme.
 
@@ -133,7 +133,7 @@ class GeneradoraDeDatos:
     """
     return stats.uniform.cdf(x,min,max)
 
-  def ppf_uniforme(self,x:float,min:float,max:float) -> np.ndarray:
+  def ppf_uniforme(self,x,min,max) -> np.ndarray:
     """
     devuelve el percentil correspondiente a x de la distribucion uniforme.
 
@@ -157,7 +157,7 @@ class GeneradoraDeDatos:
         y[ind] = np.random.normal(j/2 - 1, 1/10, size=len(ind))
     return y
 
-  def distribucion_datos_BS(self,min:float,max:float) -> np.ndarray:
+  def distribucion_datos_BS(self,min,max) -> np.ndarray:
     """
     simula una distribucion teorica BS(Bart Simpson).
 
@@ -172,7 +172,7 @@ class GeneradoraDeDatos:
     self.datos_BS=(1/2)*stats.norm.pdf(grilla,0,1)+(1/10)*sumatoria
     return grilla,self.datos_BS
 
-  def generar_datos_exponencial(self,b:float) -> np.ndarray:
+  def generar_datos_exponencial(self,b) -> np.ndarray:
     """
     genera una muestra exponencial random.
 
@@ -288,24 +288,24 @@ class Estimacion:
     return density
 
   def EMC_normal(self,datos_teoricos):
-    grilla_h=np.linspace(0.01,5,100)
-    grilla_x=np.linspace(-5,5,300)
+    __grilla_h=np.linspace(0.01,5,100)
+    __grilla_x=np.linspace(-5,5,300)
     errores=[]
-    for h in grilla_h:
-      datos_hist=self.evalua_histograma(h,grilla_x)
+    for h in __grilla_h:
+      datos_hist=self.evalua_histograma(h,__grilla_x)
       errores.append(np.sum((datos_hist-datos_teoricos)**2)/len(datos_teoricos))
-    h_minimo=grilla_h[np.argmin(errores)]
+    h_minimo=__grilla_h[np.argmin(errores)]
     EMC=np.min(errores)
     return h_minimo,EMC
 
   def EMC_kernel(self,datos_teoricos,kernel):
-    grilla_h=np.linspace(0.01,5,100)
-    grilla_x=np.linspace(-5,5,100)
+    __grilla_h=np.linspace(0.01,5,100)
+    __grilla_x=np.linspace(-5,5,100)
     errores=[]
-    for h in grilla_h:
-      datos_hist=self.densidad_nucleo(h,kernel,grilla_x)
+    for h in __grilla_h:
+      datos_hist=self.densidad_nucleo(h,kernel,__grilla_x)
       errores.append(np.sum((datos_hist-datos_teoricos)**2)/len(datos_teoricos))
-    h_minimo=grilla_h[np.argmin(errores)]
+    h_minimo=__grilla_h[np.argmin(errores)]
     EMC=np.min(errores)
     return h_minimo,EMC
 
@@ -413,6 +413,12 @@ class RegresionLineal(Regresion):
 
 
 class RegresionLogistica(Regresion):
+  """
+  clase para hacer calculos de regresion logistica
+
+  Args:
+    Regresion: clase heredada.
+  """
   def __init__(self,x,y):
     super().__init__(x,y)
     self.modelo=sm.Logit(self.y,self.x)
@@ -448,23 +454,31 @@ class RegresionLogistica(Regresion):
     return prediccion.summary_frame()
 
   def test(self,porcentaje=.8,semilla=10,punto_corte=0.5):
-    super().separar_datos(porcentaje,semilla)
-    regresion_train=RegresionLogistica(self.x_train,self.y_train)
-    parametros_train=regresion_train.parametros()
-    pi_test=[]
-    for i in range(len(self.x_test)):
-      pred=regresion_train.prediccion(self.x_test.iloc[[i]])
-      pi_test.append(pred.item())
-    self.y_pred=[]
-    for i in range(len(pi_test)):
-      if pi_test[i]<punto_corte:
+    """
+    funcion para calcular el error total, la sensibilidad y especificidad de un modelo de regresion logistica.
+
+    Args:
+      porcentaje: porcentaje de datos que iran a la instancia de entrenamiento.
+      semilla: seed por si se requiere  unificar resultados.
+      punto_corte: valor de corte para la prediccion de las respuestas.
+    """
+    super().separar_datos(porcentaje,semilla) #separa los datos en train y test, hereda la funcion de Regresion
+    regresion_train=RegresionLogistica(self.x_train,self.y_train) #instancia la misma clase con los datos de entrenamiento
+    parametros_train=regresion_train.parametros() #guarda los betas
+    pi_test=[] #inicializa lista para las probabilidades de exito del test.
+    for i in range(len(self.x_test)): #recorre el rango de x_test
+      pred=regresion_train.prediccion(self.x_test.iloc[[i]]) #predice el valor de y de los x_test a partir del modelo de entrenamiento
+      pi_test.append(pred.item()) #agregamos el valor de predicicon
+    self.y_pred=[] #inicializamos una lista para las respuestas predichas
+    for i in range(len(pi_test)): #recorremos el rango de pi_test
+      if pi_test[i]<punto_corte: #verificamos si las probabilidades son mayores que el punto de corte y agregamos un 1 si si y un 0 si no.
         self.y_pred.append(0)
       else:
         self.y_pred.append(1)
-    self.y_pred=np.array(self.y_pred)
-    self.error=np.mean(self.y_pred!=self.y_test.values)
-    self.sensibilidad=(np.sum((self.y_pred==1)&(self.y_test==1)))/np.sum(self.y_test==1)
-    self.especificidad=(np.sum((self.y_pred==0)&(self.y_test==0)))/np.sum(self.y_test==0)
+    self.y_pred=np.array(self.y_pred) #transformamos la lista en arreglo
+    self.error=np.mean(self.y_pred!=self.y_test.values) #calculamos error
+    self.sensibilidad=(np.sum((self.y_pred==1)&(self.y_test==1)))/np.sum(self.y_test==1) #calculamos sensibilidad
+    self.especificidad=(np.sum((self.y_pred==0)&(self.y_test==0)))/np.sum(self.y_test==0) #calculamos especificidad
     return self.error,self.sensibilidad,self.especificidad
 
   def indice_youden(self,porcentaje=.8,semilla=10):
@@ -481,48 +495,71 @@ class RegresionLogistica(Regresion):
     return grilla_corte[indice_youden],self.lista_sensibilidad[indice_youden],self.lista_especificidad[indice_youden]
 
   def AUC(self):
-    instancia=RegresionLogistica(self.x,self.y)
-    _,_,_=instancia.indice_youden()
-    sensibilidad=np.array(instancia.lista_sensibilidad)
-    especificidad=np.array(instancia.lista_especificidad)
+    __instancia=RegresionLogistica(self.x,self.y)
+    _,_,_=__instancia.indice_youden()
+    sensibilidad=np.array(__instancia.lista_sensibilidad)
+    especificidad=np.array(__instancia.lista_especificidad)
     return auc(1-especificidad,sensibilidad)
 
 
 
 class anova():
-  def __init__(self, resultados, resultados_reducidos):
+  def __init__(self, resultados_reducidos, resultados):
     self.resultados = resultados
     self.resultados_reducidos = resultados_reducidos
-    self.anova=anova_lm(self.resultados_reducidos,self.resultados)
+    self.ajuste=anova_lm(self.resultados_reducidos,self.resultados)
 
-  def resultados(self):
-    print(self.anova)
+  def test(self):
+    return self.ajuste
 
   def p_valores(self):
-    return self.anova.pvalues
+    return self.anova.iloc[:,5]
 
   def f_valores(self):
-    return self.anova.fvalue
+    return self.anova.iloc[:,4]
 
 
 
 
 
 class cualitativas:
+  """
+  clase para determinar si una distribucion no sigue una cierta distribucion usando chi-cuadrado.
+
+  """
   def __init__(self,muestra,muestra_teorica):
+    """
+    inicializa una instancia de cualitativas.
+
+    Args:
+      muestra: muestra de datos a comparar.
+      muestra_teorica: muestra teorica.
+    """
     self.muestra=muestra
     self.muestra_teorica=muestra_teorica
-    self.grados_libertad=len(muestra)-1
+    self.grados_libertad=len(muestra)-1 #asigna los grados de libertad: n-1 (n:cantidad de respuestas).
 
   def chi_observado(self):
+    """
+    calcula el valor de chi-cuadrado observado.
+    """
     x2_observado=np.sum((self.muestra-self.muestra_teorica)**2/self.muestra_teorica)
     return x2_observado
 
-  def chi_alpha(self,alpha):
+  def chi_alpha(self,alpha=0.05):
+    """
+    calcula el valor de chi-cuadrado critico.
+
+    Args:
+      alpha: nivel de significancia.
+    """
     x2_alpha=stats.chi2.ppf(1-alpha,self.grados_libertad)
     return x2_alpha
 
   def p_valor(self):
-    x2_observado=self.chi_observado()
+    """
+    calcula el p-valor de nuestro chi observado.
+    """
+    x2_observado=self.chi_observado() #llamamos a la funcion chi_observado de la misma clase.
     p_valor=1-stats.chi2.cdf(x2_observado,self.grados_libertad)
     return p_valor
