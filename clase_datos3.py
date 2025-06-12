@@ -513,10 +513,10 @@ class anova():
     return self.ajuste
 
   def p_valores(self):
-    return self.anova.iloc[:,5]
+    return self.ajuste.iloc[:,5]
 
   def f_valores(self):
-    return self.anova.iloc[:,4]
+    return self.ajuste.iloc[:,4]
 
 
 
